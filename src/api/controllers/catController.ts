@@ -56,6 +56,7 @@ const catPost = async (
   // catPost should use req.file to get filename
   // catPost should use res.locals.coords to get lat and lng (see middlewares.ts)
   // catPost should use req.user to get user_id and role (see passport/index.ts and express.d.ts)
+
 };
 
 const catPut = async (
@@ -76,7 +77,7 @@ const catPut = async (
 
   try {
     const id = Number(req.params.id);
-    const cat = req.body;
+    const cat = Number(req.body);
     const result = await updateCat(cat, id, req.user.user_id, req.user.role);
     res.json(result);
   } catch (error) {
@@ -87,5 +88,8 @@ const catPut = async (
 // TODO: create catDelete function to delete cat
 // catDelete should use deleteCat function from catModel
 // catDelete should use validationResult to validate req.params.id
+const catDelete = () => {
+
+}
 
 export {catListGet, catGet, catPost, catPut, catDelete};

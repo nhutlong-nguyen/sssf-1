@@ -26,10 +26,25 @@ const getAllCats = async (): Promise<Cat[]> => {
 };
 
 // TODO: create getCat function to get single cat
-
+const getCat = async (id: number) => {
+  const sql = promisePool.format(
+    'SELECT * FROM sssf_cat WHERE cat_id = ?',
+    [id]
+  );
+  console.log(sql);
+  const [rows] = await promisePool.execute<RowDataPacket[] & Cat[]>(sql);
+  if (rows.length === 0) {
+    throw new CustomError('No cat found', 404);
+  }
+  return rows[0];
+};
 // TODO: use Utility type to modify Cat type for 'data'.
 // Note that owner is not User in this case. It's just a number (user_id)
-const addCat = async (data): Promise<MessageResponse> => {
+
+//omits the 'owner' field from 'Cat' and adds it back as just a number
+type CatInsertData = Omit<Cat, 'owner'> & {owner: number};
+
+const addCat = async (data: CatInsertData): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
     `
     INSERT INTO sssf_cat (cat_name, weight, owner, filename, birthdate, coords) 
@@ -55,6 +70,29 @@ const addCat = async (data): Promise<MessageResponse> => {
 // if role is admin, update any cat
 // if role is user, update only cats owned by user
 // You can use updateUser function from userModel as a reference for SQL
+const updateCat = async (
+  id: number,
+  data: Partial<Cat>,
+  owner: number,
+  isAdmin: boolean
+): Promise<MessageResponse> => {
+  let sql = 'UPDATE sssf_cat SET ? WHERE cat_id = ?';
+
+  if (!isAdmin) {
+    sql += ' AND owner = ?';
+  }
+
+  const formattedSql = promisePool.format(sql, !isAdmin ? [data, id, owner] : [data, id]);
+
+  const [headers] = await promisePool.execute<ResultSetHeader>(formattedSql);
+
+  if (headers.affectedRows === 0) {
+    throw new CustomError('No cats updated', 400);
+  }
+
+  return { message: 'Cat updated' };
+};
+
 
 const deleteCat = async (catId: number): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
