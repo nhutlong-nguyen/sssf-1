@@ -9,3 +9,8 @@ declare global {
     interface User extends Partial<UserType> {}
   }
 }
+
+//added: purpose of this file is to inform TypeScript that
+//whenever we access 'req.user' in the express app (where req is an instance of an Express request)
+//it can be expect to find the properties defined in UserType
+//though they may not all be present

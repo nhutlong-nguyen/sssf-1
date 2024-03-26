@@ -28,3 +28,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export {login};
+
+//added: PartialUser is used in the callback signature of the passport.authenticate
+//method to type the user parameter. This indicate that the user object might not have all
+//the properties that are defined in the User type, specifically the password property

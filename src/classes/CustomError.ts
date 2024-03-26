@@ -7,3 +7,8 @@ export default class CustomError extends Error {
     Object.setPrototypeOf(this, CustomError.prototype);
   }
 }
+
+//added: custom error class allows for better error handling
+//by attaching status code to error
+//which then can be used to send HTTP responses with the correct status code
+//when an error occurs

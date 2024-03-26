@@ -6,11 +6,16 @@ import {
   catPost,
   catPut,
 } from '../controllers/catController';
+//multer is a middleware which is used for uploading files
 import multer, {FileFilterCallback} from 'multer';
+//these imports are used to validate and sanitize request parameters adn body data
 import {body, param} from 'express-validator';
 import passport from '../../passport';
 import {getCoordinates, makeThumbnail} from '../../middlewares';
 
+//added: fileFilter is used by multer to determine
+//which files should be uploaded
+//if the file is an image, it allows the upload, otherwise, it rejects it
 const fileFilter = (
   request: Request,
   file: Express.Multer.File,
@@ -22,6 +27,7 @@ const fileFilter = (
     cb(null, false);
   }
 };
+//added: configure multer with a destination for file uploads and fileFilter
 const upload = multer({dest: './uploads/', fileFilter});
 const router = express.Router();
 
