@@ -33,6 +33,24 @@ const getUser = async (userId: number): Promise<User> => {
 };
 
 // TODO: create addUser function
+const addUser = async (data: User): Promise<MessageResponse> => {
+  const [headers] = await promisePool.execute<ResultSetHeader>(
+    `
+      INSERT INTO sssf_user (user_name, email, password, role) 
+      VALUES (?, ?, ?, ?)
+    `,
+    [
+      data.user_name,
+      data.email,
+      data.password,
+      data.role,
+    ]
+  );
+  if (headers.affectedRows === 0) {
+    throw new CustomError('No cats added', 400);
+  }
+  return {message: 'User added'};
+};
 
 const updateUser = async (
   data: Partial<User>,
