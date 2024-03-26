@@ -1,5 +1,7 @@
+//added: import promise-based version of the msql2 client
 import mysql from 'mysql2/promise';
 
+//added: create pool of connections to the MySQL database with the given configuration
 const promisePool = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USER,

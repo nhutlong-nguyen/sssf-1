@@ -1,5 +1,7 @@
 import {promisePool} from '../../database/db';
 import CustomError from '../../classes/CustomError';
+//added: ResultSetHeader for typing the result of insert and delete operations
+//RowDataPacket for the result of select queries
 import {ResultSetHeader, RowDataPacket} from 'mysql2';
 import {Cat} from '../../types/DBTypes';
 import {MessageResponse, UploadResponse} from '../../types/MessageTypes';

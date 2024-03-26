@@ -9,16 +9,23 @@ import CustomError from './classes/CustomError';
 // convert GPS coordinates to decimal format
 // for longitude, send exifData.gps.GPSLongitude, exifData.gps.GPSLongitudeRef
 // for latitude, send exifData.gps.GPSLatitude, exifData.gps.GPSLatitudeRef
+
+//added: helper function to convert GPTS coordinates from degrees, mins, secs to decimal format
+//used in getCoordinates
 const gpsToDecimal = (gpsData: number[], hem: string) => {
   let d = gpsData[0] + gpsData[1] / 60 + gpsData[2] / 3600;
   return hem === 'S' || hem === 'W' ? (d *= -1) : d;
 };
 
+//added: creates new CustomError when a route is not found (404)
+// passes it along to the errorhandling middleware
 const notFound = (req: Request, _res: Response, next: NextFunction) => {
   const error = new CustomError(`🔍 - Not Found - ${req.originalUrl}`, 404);
   next(error);
 };
 
+//added: error-handling middleware, formats and sends an error response to client
+//checks if the environment is production, whether to send the error stack trace to client
 const errorHandler = (
   err: CustomError,
   _req: Request,
@@ -33,6 +40,9 @@ const errorHandler = (
   });
 };
 
+//added: middleware, extract GPS coordinates from EXIF data of an image
+//store them in res.locals.coords
+//if fails, it defaults to a set predefined coordiates ([60, 24])
 const getCoordinates = (req: Request, res: Response, next: NextFunction) => {
   try {
     console.log(req.file?.path);
@@ -70,6 +80,7 @@ const getCoordinates = (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+//added: uses sharps library to create a thumbnail of an uploaded image file
 const makeThumbnail = async (
   req: Request,
   _res: Response,
