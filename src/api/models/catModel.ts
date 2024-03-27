@@ -37,20 +37,26 @@ const getCat = async (catId: number): Promise<Cat> => {
   const [rows] = await promisePool.execute<RowDataPacket[] & Cat[]>(
     `
     SELECT cat_id, cat_name, weight, filename, birthdate, ST_X(coords) AS lat, ST_Y(coords) AS lng,
-    JSON_OBJECT('user_id', user_id, 'user_name', user_name) AS owner
+    JSON_OBJECT('user_id', sssf_user.user_id, 'user_name', sssf_user.user_name) AS owner
     FROM sssf_cat
-    JOIN sssf_user 
-    ON sssf_cat.owner = sssf_user.user_id 
+    JOIN sssf_user ON sssf_cat.owner = sssf_user.user_id 
     WHERE cat_id = ?;
     `,
     [catId]
   );
-  
+
   if (rows.length === 0) {
     throw new CustomError('Cat not found', 404);
   }
 
-  return rows[0];
+  // Directly access the first row, which is the cat data
+  const catData = rows[0];
+
+  // Assuming 'owner' is a JSON string and needs to be parsed
+  // If the 'owner' field is already parsed by your SQL driver, you can assign it directly without parsing
+  catData.owner = JSON.parse(catData.owner?.toString() || '{}');
+
+  return catData;
 };
 
 
@@ -83,6 +89,14 @@ const addCat = async (data: CatInsertData): Promise<MessageResponse> => {
 // if role is admin, update any cat
 // if role is user, update only cats owned by user
 // You can use updateUser function from userModel as a reference for SQL
+const updateCat = async (
+  data: Partial<Omit<Cat, 'cat_id' | 'owner'>>,
+  catId: number,
+  userId?: number,
+  userRole?: string
+): Promise<MessageResponse> => {
+  return {message: 'OK'};
+};
 
 const deleteCat = async (catId: number): Promise<MessageResponse> => {
   const [headers] = await promisePool.execute<ResultSetHeader>(
